@@ -1,0 +1,126 @@
+inventory = [
+{"item_id": 1, "name": "Espresso", "unit_price": 2.50, "stock": 40},
+{"item_id": 2, "name": "Latte", "unit_price": 4.25, "stock": 25},
+{"item_id": 3, "name": "Cold Brew", "unit_price": 3.75, "stock": 30},
+{"item_id": 4, "name": "Mocha", "unit_price": 4.50, "stock": 20},
+{"item_id": 5, "name": "Blueberry Muffin", "unit_price": 2.95, "stock": 18},
+]
+
+orders = [
+{"order_id": "Order_101", "item_id": 2, "quantity": 2, "status": "Placed", "total": 8.50},
+{"order_id": "Order_102", "item_id": 3, "quantity": 1, "status": "Placed", "total": 3.75},
+]
+
+#### Create (Query 1)
+
+#Inputs
+item_id = int(input("Enter the Item ID to order: "))
+quantity = int(input("Enter the quantity: "))
+
+#Process: Creating the order
+selected_item = None
+for inventory_item in inventory:
+if inventory_item["item_id"] == item_id:
+selected_item = inventory_item
+break
+if selected_item is None:
+print("Item not found.")
+elif selected_item["stock"] < quantity:
+print("Not enough stock available.")
+else:
+original_stock = selected_item["stock"]
+selected_item["stock"] -= quantity
+updated_stock = selected_item["stock"]
+total_price = quantity * selected_item["unit_price"]
+new_order_id = f"Order_{len(orders) + 101}"
+new_order = {
+"order_id": new_order_id,
+"item_id": item_id,
+"quantity": quantity,
+"status": "Placed",
+"total": total_price
+}
+orders.append(new_order)
+
+#Output
+print(f"Stock for {selected_item['name']} reduces from {original_stock} to {updated_stock}")
+
+
+### Read (Query 2)
+#Input
+search_item = input("Enter the item name to search (e.g. 'Latte'): ")
+#Process: Finding orders
+matching_item_id = None
+for inventory_item in inventory:
+if inventory_item["name"].lower() == search_item.lower():
+matching_item_id = inventory_item["item_id"]
+break
+matching_orders = []
+if matching_item_id is not None:
+for customer_order in orders:
+if customer_order["item_id"] == matching_item_id:
+matching_orders.append(customer_order)
+#Output
+if len(matching_orders) > 0:
+print(f"Orders placed for {search_item}:")
+for order in matching_orders:
+print(order)
+else:
+print("No orders found for that item.")
+
+
+### Analysis (Query 3)
+#Input
+target_item_name = "Cold Brew"
+#Process: Counting the orders
+cold_brew_id = None
+for inventory_item in inventory:
+if inventory_item["name"] == target_item_name:
+cold_brew_id = inventory_item["item_id"]
+break
+cold_brew_order_count = 0
+for customer_order in orders:
+if customer_order["item_id"] == cold_brew_id:
+cold_brew_order_count += 1
+#Output
+print(f"Total number of orders placed for Cold Brew: {cold_brew_order_count}")
+
+
+### Update (Query 4)
+#Input
+update_item_id = int(input("Enter ID of item to update: "))
+new_stock = int(input("Enter new stock quantity: "))
+#Process: Updating the dictionary
+item_found = False
+for inventory_item in inventory:
+if inventory_item["item_id"] == update_item_id:
+inventory_item["stock"] = new_stock
+item_found = True
+break
+#Output
+if item_found:
+print(f"Cold Brew stock updates to {new_stock}")
+else:
+print("Item not found.")
+
+### Delete (Query 5)
+#Input
+cancel_order_id = input("Enter Order ID to cancel: ")
+#Process: Deleting from the dictionary
+order_found = None
+for customer_order in orders:
+if customer_order["order_id"] == cancel_order_id:
+order_found = customer_order
+break
+if order_found is None:
+print("Order not found.")
+else:
+order_found["status"] = "Cancelled"
+restore_item_id = order_found["item_id"]
+restore_quantity = order_found["quantity"]
+for inventory_item in inventory:
+if inventory_item["item_id"] == restore_item_id:
+inventory_item["stock"] += restore_quantity
+break
+#Output
+print(f"Order status changes to 'Cancelled', and Stock for Item {restore_item_id} increases back by {restore_quantity}")
